@@ -10,23 +10,20 @@ cross = ImageTk.PhotoImage(Image.open("cross.png"))
 
 board = [[' ',' ',' ',],
         [' ',' ',' ',],
-        [' ',' ',' ']] # Remembers the state of the board
+        [' ',' ',' ']]
 
-turn = 1 #whose turn it is
+turn = 1
 
-difficulty = 0 # difficulty of AI
+difficulty = 0
 
 
 def initialise():
     for row_num in range(3):
-        ap = []
         for col_num in range(3):
             sq = Label(root, image=blank)
             #sq.image = blank
             sq.bind("<Button-1>", change)
             sq.grid(row=row_num, column = col_num)
-            ap.append(sq)
-        board.append(ap)
 
 def change(event):
     print("Event!")
@@ -41,14 +38,32 @@ def change(event):
     switch(1)
 
 def check_win():
-    
+    for row in board:
+        if all(item == 'X' for item in row):
+            return 'X'
+        elif all (item == 'O' for item in row):
+            return 'O'
+    for column in range(3):
+        if all(row[column] =='X' for row in board):
+            return 'X'
+        elif all(row[column] =='O' for row in board):
+            return 'O'
+    middle = board[1][1]
+    if middle == board[0][0] and middle == board[2][2] or middle == board[0][2] and middle == board[2][0]:
+        return middle
+    return ' '
 
 def switch(turn):
-    check_win()
-    if turn == 1:
-        AI_move()
+    state = check_win()
+    if state == ' ':
+        if turn == 1:
+            AI_move(board)
+    elif state == 'X':
+    
+    elif state == 'O':
+    
 
-def AI_move()
+def AI_move(state)
 
 initialise()
 root.mainloop()

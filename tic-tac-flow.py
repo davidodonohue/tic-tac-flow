@@ -16,8 +16,6 @@ dict = {}
 
 players = ['X', 'O']
 
-difficulty = 0
-
 
 def initialise():
     for row_num in range(3):

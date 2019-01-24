@@ -42,25 +42,20 @@ def change(event):
     board[info["row"]][info["column"]] = 'X'
     finish_play()
 
-def check_win():
-    for row in board:
+def check_win(b):
+    for row in b:
         if all(item == 'X' for item in row):
-            print("One")
             return 'X'
         elif all (item == 'O' for item in row):
-            print("Two")
             return 'O'
     for column in range(3):
-        if all(row[column] =='X' for row in board):
-            print("Three")
+        if all(row[column] =='X' for row in b):
             return 'X'
-        elif all(row[column] =='O' for row in board):
-            print("Four")
+        elif all(row[column] =='O' for row in b):
             return 'O'
-    middle = board[1][1]
+    middle = b[1][1]
     if middle != ' ':
-        if middle == board[0][0] and middle == board[2][2] or middle == board[0][2] and middle == board[2][0]:
-            print("Five")
+        if middle == b[0][0] and middle == b[2][2] or middle == b[0][2] and middle == b[2][0]:
             return middle
     return ' '
 
@@ -73,7 +68,7 @@ def get_moves(b):
     return empty
 
 def finish_play():
-    state = check_win()
+    state = check_win(board)
     if state == ' ':
         move = AI_move(board)
         sq = dict[move]
@@ -83,14 +78,19 @@ def finish_play():
         #sq.image = nought
         sq.grid(row=info["row"], column=info["column"])
         board[info["row"]][info["column"]] = 'O'
+        state = check_win(board)
+        if state != ' ' or get_moves(board) == []:
+            reset_game(state)
     else:
         reset_game(state)
 
 def reset_game(winner):
     if winner == 'X':
-        messagebox.showwarning("Congratulations!", "You win!")
+        messagebox.showinfo("Congratulations!", "You win!")
+    elif winner == 'O':
+        messagebox.showinfo("Commiserations!","Better luck next time!")
     else:
-        messagebox.showinfo("Comiserations!","Better luck next time!")
+        messagebox.showinfo("Draw!","It's a draw!")
     for child in root.winfo_children():
         child.destroy()
     initialise()
@@ -107,17 +107,16 @@ def get_children(b, player, moves):
 def AI_move(b):
     possible_moves = get_moves(b)
     possible_boards = get_children(b, 1, possible_moves)
-    draw = possible_moves[0]
+    best = (-2,possible_moves[0])
     for (move, bd) in possible_boards:
-        result = minimax(bd, 0)
-        if result == -1:
-            return move
-        elif result == 0:
-            draw = move
-    return draw    #always return
+        result = -1*minimax(bd, 0)
+        if result > best[0]:
+            best = (result, move)
+    return best[1]
 
 def minimax(b, player):
-    state = check_win()
+    state = check_win(b)
+    value = -2
     if state == players[(player + 1) %2]:
         return (-1)
     elif state == players[player]:
@@ -128,10 +127,9 @@ def minimax(b, player):
             return 0
         possible_boards = get_children(b,player,possible_moves)
         for (move, bd) in possible_boards:
-            opponent_wins = minimax(bd,(player + 1) % 2)
-            if opponent_wins == -1:
-                return 1
-        return 0
+            opponent_wins = -1*minimax(bd,(player + 1) % 2)
+            value = max(value, opponent_wins)
+        return value
 
 initialise()
 root.mainloop()

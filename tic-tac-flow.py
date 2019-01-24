@@ -37,7 +37,6 @@ def change(event):
     info = sq.grid_info()
     sq.destroy()
     sq = Label(root, image=cross)
-    #sq.image = cross
     sq.grid(row=info["row"], column=info["column"])
     board[info["row"]][info["column"]] = 'X'
     finish_play()
@@ -75,7 +74,6 @@ def finish_play():
         info = sq.grid_info()
         sq.destroy()
         sq = Label(root, image=nought)
-        #sq.image = nought
         sq.grid(row=info["row"], column=info["column"])
         board[info["row"]][info["column"]] = 'O'
         state = check_win(board)

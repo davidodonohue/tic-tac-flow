@@ -1,5 +1,7 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import Image, ImageTk
+import copy
 
 root = Tk()
 
@@ -42,8 +44,6 @@ def change(event):
 
 def check_win():
     for row in board:
-        print(row)
-    for row in board:
         if all(item == 'X' for item in row):
             print("One")
             return 'X'
@@ -64,18 +64,13 @@ def check_win():
             return middle
     return ' '
 
-def get_successors(board):
+def get_moves(b):
     empty = []
     for row in range(3):
         for column in range(3):
-            if board[row][column] == ' ':
+            if b[row][column] == ' ':
                 empty.append((row, column))
     return empty
-
-def make_abstract_move(b,player,move):
-    bd = b.copy()
-    bd[move[0]][move[1]] = players[player]
-    return bd
 
 def finish_play():
     state = check_win()
@@ -93,21 +88,28 @@ def finish_play():
 
 def reset_game(winner):
     if winner == 'X':
-        tk.messagebox.showinfo("Congratulations!", "You win!")
+        messagebox.showwarning("Congratulations!", "You win!")
     else:
-        tk.messagebox.showinfo("Comiserations!","Better luck next time!")
+        messagebox.showinfo("Comiserations!","Better luck next time!")
     for child in root.winfo_children():
         child.destroy()
     initialise()
 
-def AI_move(state):
-    possible_moves = get_successors(state)
-    possible_boards = [make_abstract_move(state,1,x) for x in possible_moves]
+def get_children(b, player, moves):
+    rtn = []
+    for move in moves:
+        b_cp = copy.deepcopy(b)
+        b_cp[move[0]][move[1]] = players[player]
+        rtn.append((move, b_cp))
+    return rtn
+        
+    
+def AI_move(b):
+    possible_moves = get_moves(b)
+    possible_boards = get_children(b, 1, possible_moves)
     draw = possible_moves[0]
-    for (move, b) in zip(possible_moves,possible_boards):
-        result = minimax(b, 0)
-        for r in board:
-            print (r)
+    for (move, bd) in possible_boards:
+        result = minimax(bd, 0)
         if result == -1:
             return move
         elif result == 0:
@@ -121,11 +123,11 @@ def minimax(b, player):
     elif state == players[player]:
         return 1
     else:
-        possible_moves = get_successors(state)
+        possible_moves = get_moves(b)
         if possible_moves == []:
             return 0
-        possible_boards = [make_abstract_move(b,player,x) for x in possible_moves]
-        for (move, bd) in zip(possible_moves,possible_boards):
+        possible_boards = get_children(b,player,possible_moves)
+        for (move, bd) in possible_boards:
             opponent_wins = minimax(bd,(player + 1) % 2)
             if opponent_wins == -1:
                 return 1

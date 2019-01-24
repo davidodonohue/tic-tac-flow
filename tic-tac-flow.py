@@ -104,15 +104,17 @@ def get_children(b, player, moves):
     
 def AI_move(b):
     possible_moves = get_moves(b)
+    if possible_moves == []:
+        reset_game(check_win(b))
     possible_boards = get_children(b, 1, possible_moves)
     best = (-2,possible_moves[0])
     for (move, bd) in possible_boards:
-        result = -1*minimax(bd, 0)
+        result = -1*minimax(bd, 0, -2, 2)
         if result > best[0]:
             best = (result, move)
     return best[1]
 
-def minimax(b, player):
+def minimax(b, player, alpha, beta):
     state = check_win(b)
     value = -2
     if state == players[(player + 1) %2]:
@@ -125,8 +127,11 @@ def minimax(b, player):
             return 0
         possible_boards = get_children(b,player,possible_moves)
         for (move, bd) in possible_boards:
-            opponent_wins = -1*minimax(bd,(player + 1) % 2)
+            opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha)
             value = max(value, opponent_wins)
+            alpha = max(alpha, value)
+            if alpha >- beta:
+                return value
         return value
 
 initialise()

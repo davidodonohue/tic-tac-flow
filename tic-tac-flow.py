@@ -43,17 +43,23 @@ def change(event):
 def check_win():
     for row in board:
         if all(item == 'X' for item in row):
+            print("One")
             return 'X'
         elif all (item == 'O' for item in row):
+            print("Two")
             return 'O'
     for column in range(3):
         if all(row[column] =='X' for row in board):
+            print("Three")
             return 'X'
         elif all(row[column] =='O' for row in board):
+            print("Four")
             return 'O'
     middle = board[1][1]
-    if middle == board[0][0] and middle == board[2][2] or middle == board[0][2] and middle == board[2][0]:
-        return middle
+    if middle != ' ':
+        if middle == board[0][0] and middle == board[2][2] or middle == board[0][2] and middle == board[2][0]:
+            print("Five")
+            return middle
     return ' '
 
 def get_successors(board):
@@ -84,9 +90,9 @@ def finish_play():
 
 def reset_game(winner):
     if winner == 'X':
-        messagebox.showinfo("Congratulations!", "You win!")
+        tk.messagebox.showinfo("Congratulations!", "You win!")
     else:
-        messagebox.showinfo("Comiserations!","Better luck next time!")
+        tk.messagebox.showinfo("Comiserations!","Better luck next time!")
     for child in root.winfo_children():
         child.destroy()
     initialise()

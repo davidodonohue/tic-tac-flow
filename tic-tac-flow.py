@@ -42,6 +42,8 @@ def change(event):
 
 def check_win():
     for row in board:
+        print(row)
+    for row in board:
         if all(item == 'X' for item in row):
             print("One")
             return 'X'
@@ -70,9 +72,10 @@ def get_successors(board):
                 empty.append((row, column))
     return empty
 
-def make_abstract_move(board,player,move):
-   board[move[0]][move[1]] = players[player]
-   return board
+def make_abstract_move(b,player,move):
+    bd = b.copy()
+    bd[move[0]][move[1]] = players[player]
+    return bd
 
 def finish_play():
     state = check_win()
@@ -101,15 +104,17 @@ def AI_move(state):
     possible_moves = get_successors(state)
     possible_boards = [make_abstract_move(state,1,x) for x in possible_moves]
     draw = possible_moves[0]
-    for (move, board) in zip(possible_moves,possible_boards):
-        result = minimax(board, 0)
+    for (move, b) in zip(possible_moves,possible_boards):
+        result = minimax(b, 0)
+        for r in board:
+            print (r)
         if result == -1:
             return move
         elif result == 0:
             draw = move
     return draw    #always return
 
-def minimax(board, player):
+def minimax(b, player):
     state = check_win()
     if state == players[(player + 1) %2]:
         return (-1)
@@ -119,9 +124,9 @@ def minimax(board, player):
         possible_moves = get_successors(state)
         if possible_moves == []:
             return 0
-        possible_boards = [make_abstract_move(board,player,x) for x in possible_moves]
-        for (move, board) in zip(possible_moves,possible_boards):
-            opponent_wins = minimax(board,(player + 1) % 2)
+        possible_boards = [make_abstract_move(b,player,x) for x in possible_moves]
+        for (move, bd) in zip(possible_moves,possible_boards):
+            opponent_wins = minimax(bd,(player + 1) % 2)
             if opponent_wins == -1:
                 return 1
         return 0

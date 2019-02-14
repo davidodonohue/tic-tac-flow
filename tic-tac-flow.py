@@ -25,10 +25,10 @@ def initialise():
             sq.bind("<Button-1>", change)
             sq.grid(row=row_num, column = col_num)
             dict[(row_num,col_num)] = sq
-            global board
-            board = [[' ',' ',' ',],
-                    [' ',' ',' ',],
-                    [' ',' ',' ']]
+    global board
+    board = [[' ',' ',' ',],
+            [' ',' ',' ',],
+            [' ',' ',' ']]
 
 def change(event):
     sq = event.widget
@@ -66,7 +66,8 @@ def get_moves(b):
 
 def finish_play():
     state = check_win(board)
-    if state == ' ':
+    print (board)
+    if state == ' ' and get_moves(board) != []:
         move = AI_move(board)
         sq = dict[move]
         info = sq.grid_info()

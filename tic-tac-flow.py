@@ -128,7 +128,7 @@ def minimax(b, player, alpha, beta):
             opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha)
             value = max(value, opponent_wins)
             alpha = max(alpha, value)
-            if alpha >- beta:
+            if alpha >= beta:
                 return value
         return value
 

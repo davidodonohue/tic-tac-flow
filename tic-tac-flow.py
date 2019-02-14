@@ -66,7 +66,6 @@ def get_moves(b):
 
 def finish_play():
     state = check_win(board)
-    print (board)
     if state == ' ' and get_moves(board) != []:
         move = AI_move(board)
         sq = dict[move]

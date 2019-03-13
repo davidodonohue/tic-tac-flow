@@ -9,6 +9,8 @@ blank = ImageTk.PhotoImage(Image.open("blank.png"))
 cross = ImageTk.PhotoImage(Image.open("cross.png"))
 nought = ImageTk.PhotoImage(Image.open("nought.png"))
 
+lookahead = 0
+
 board = [[' ',' ',' ',],
         [' ',' ',' ',],
         [' ',' ',' ']]
@@ -81,12 +83,16 @@ def finish_play():
         reset_game(state)
 
 def reset_game(winner):
+    global lookahead
     if winner == 'X':
         messagebox.showinfo("Congratulations!", "You win!")
+        lookahead += 1
     elif winner == 'O':
         messagebox.showinfo("Commiserations!","Better luck next time!")
+        lookahead -= 1
     else:
         messagebox.showinfo("Draw!","It's a draw!")
+        lookahead -= 1
     for child in root.winfo_children():
         child.destroy()
     initialise()
@@ -106,26 +112,30 @@ def AI_move(b):
         reset_game(check_win(b))
     possible_boards = get_children(b, 1, possible_moves)
     best = (-2,possible_moves[0])
-    for (move, bd) in possible_boards:
-        result = -1*minimax(bd, 0, -2, 2)
-        if result > best[0]:
-            best = (result, move)
+    if lookahead > 0:
+        d = lookahead
+        for (move, bd) in possible_boards:
+            result = -1*minimax(bd, 0, -2, 2, d-1)
+            if result > best[0]:
+                best = (result, move)
     return best[1]
 
-def minimax(b, player, alpha, beta):
+def minimax(b, player, alpha, beta, d):
     state = check_win(b)
     value = -2
     if state == players[(player + 1) %2]:
         return (-1)
     elif state == players[player]:
         return 1
+    elif d == 0:
+        return 0
     else:
         possible_moves = get_moves(b)
         if possible_moves == []:
             return 0
         possible_boards = get_children(b,player,possible_moves)
         for (move, bd) in possible_boards:
-            opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha)
+            opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha, d-1)
             value = max(value, opponent_wins)
             alpha = max(alpha, value)
             if alpha >= beta:

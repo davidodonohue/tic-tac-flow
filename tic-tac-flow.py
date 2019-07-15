@@ -5,11 +5,10 @@ import copy
 
 root = Tk()
 
-blank = ImageTk.PhotoImage(Image.open("blank.png"))
-cross = ImageTk.PhotoImage(Image.open("cross.png"))
-nought = ImageTk.PhotoImage(Image.open("nought.png"))
+blank = ImageTk.PhotoImage(Image.open("blank200.png"))
+cross = ImageTk.PhotoImage(Image.open("cross200.png"))
+nought = ImageTk.PhotoImage(Image.open("nought200.png"))
 
-lookahead = 0
 
 board = [[' ',' ',' ',],
         [' ',' ',' ',],
@@ -23,7 +22,6 @@ def initialise():
     for row_num in range(3):
         for col_num in range(3):
             sq = Label(root, image=blank)
-            #sq.image = blank
             sq.bind("<Button-1>", change)
             sq.grid(row=row_num, column = col_num)
             dict[(row_num,col_num)] = sq
@@ -83,16 +81,12 @@ def finish_play():
         reset_game(state)
 
 def reset_game(winner):
-    global lookahead
     if winner == 'X':
         messagebox.showinfo("Congratulations!", "You win!")
-        lookahead += 1
     elif winner == 'O':
         messagebox.showinfo("Commiserations!","Better luck next time!")
-        lookahead -= 1
     else:
         messagebox.showinfo("Draw!","It's a draw!")
-        lookahead -= 1
     for child in root.winfo_children():
         child.destroy()
     initialise()
@@ -112,30 +106,26 @@ def AI_move(b):
         reset_game(check_win(b))
     possible_boards = get_children(b, 1, possible_moves)
     best = (-2,possible_moves[0])
-    if lookahead > 0:
-        d = lookahead
-        for (move, bd) in possible_boards:
-            result = -1*minimax(bd, 0, -2, 2, d-1)
-            if result > best[0]:
-                best = (result, move)
+    for (move, bd) in possible_boards:
+        result = -1*minimax(bd, 0, -2, 2)
+        if result > best[0]:
+            best = (result, move)
     return best[1]
 
-def minimax(b, player, alpha, beta, d):
+def minimax(b, player, alpha, beta):
     state = check_win(b)
     value = -2
     if state == players[(player + 1) %2]:
         return (-1)
     elif state == players[player]:
         return 1
-    elif d == 0:
-        return 0
     else:
         possible_moves = get_moves(b)
         if possible_moves == []:
             return 0
         possible_boards = get_children(b,player,possible_moves)
         for (move, bd) in possible_boards:
-            opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha, d-1)
+            opponent_wins = -1*minimax(bd,(player + 1) % 2, -beta, -alpha)
             value = max(value, opponent_wins)
             alpha = max(alpha, value)
             if alpha >= beta:
